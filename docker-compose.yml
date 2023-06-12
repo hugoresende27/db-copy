@@ -1,0 +1,23 @@
+version: "3.8"
+
+services:
+  app:
+    build:
+      context: ./docker/php
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    volumes:
+      - .:/var/www/html
+    environment:
+      - TZ=Europe/Lisbon # Set the timezone here
+
+  mongo:
+    ports:
+      - '27017:27017'
+    container_name: db-copy_mongodb
+    restart: always
+    logging:
+      options:
+        max-size: 1g
+    image: mongo
