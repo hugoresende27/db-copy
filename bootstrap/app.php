@@ -1,23 +1,36 @@
 <?php
+
+use DI\ContainerBuilder;
 use MongoDB\Client;
 use MongoDB\Driver\Exception\Exception;
-use Slim\Factory\AppFactory;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
+use Slim\Factory\AppFactory;
 
+// Create the container
+$containerBuilder = new ContainerBuilder();
+$container = $containerBuilder->build();
 
+$app = AppFactory::createFromContainer($container);
 
+//error log
+$app->addErrorMiddleware(true,true,true);
 
+$app->get('/hello/{name}', function (Request $request, Response $response, $args) {
 
-$app = AppFactory::create();
+    $name = $args['name']; // Retrieve the value of the "name" parameter
 
-$app->get('/', function (Request $request, Response $response, $args) {
+    $response->getBody()->write('Hello '.$name.'!');
+    return $response;
+});
+
+$app->get('/', function (Request $request, Response $response) {
     $test = $_ENV['APP_NAME'];
     $response->getBody()->write("db-copy :: ".json_encode($test));
     return $response;
 });
 
-$app->get('/dev', function (Request $request, Response $response, $args) {
+$app->get('/dev', function () {
     $client = new Client($_ENV['MONGO_URI']);
 
 
@@ -26,12 +39,24 @@ $app->get('/dev', function (Request $request, Response $response, $args) {
         $r = $client->selectDatabase($_ENV['MONGO_DB']);
         $r = $r->selectCollection('test');
         echo "<pre>";
-        var_dump($r->find()->toArray());
-        die();
+        dd($r->find()->toArray());
+
     } catch (Exception $e) {
-        var_dump(printf($e->getMessage()));
-        die();
+        dd(printf($e->getMessage()));
+
     }
 });
+
+
+class UserController
+{
+
+    public function index()
+    {
+        dd('aqui');
+    }
+}
+
+$app->get('/c', [UserController::class, 'index']);
 
 return $app;
