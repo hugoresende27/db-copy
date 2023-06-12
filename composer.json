@@ -6,6 +6,8 @@
         "ext-mongodb": "*",
         "vlucas/phpdotenv": "^5.5",
         "symfony/var-dumper": "^6.3",
-        "php-di/slim-bridge": "^3.3"
+        "php-di/slim-bridge": "^3.3",
+        "ext-json": "*",
+        "ext-pdo": "*"
     }
 }
