@@ -25,4 +25,5 @@
 ------------------------------------------------
 #### MongoDB
 - customize string connection : https://www.mongodb.com/docs/manual/reference/connection-string/
+- mongosh to enter mongo client in container
 

@@ -32,6 +32,7 @@ $app->get('/mongo', [HomeController::class, 'mongoConnect']);
 //source routes
 $app->post('/source', [HomeController::class, 'sourceConnect']);
 $app->post('/source/{table}', [HomeController::class, 'sourceConnectTable']);
-$app->post('/source/copy/{table}', [HomeController::class, 'copySourceTableToMongo']);
+$app->post('/source/{table}/{page}', [HomeController::class, 'sourceConnectTable']);
+$app->post('/source-copy/{table}', [HomeController::class, 'copySourceTableToMongo']);
 
 return $app;

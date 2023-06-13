@@ -26,5 +26,4 @@ class SourceDB
         return $conn;
     }
 
-
 }

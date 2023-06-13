@@ -33,21 +33,52 @@ class SourceRepository implements SourceRepositoryInterface
         ];
     }
 
-    public function readTable($host, $user, $pass, $dbName, $tableName): array
+
+    public function readTable($host, $user, $pass, $dbName, $tableName,$page = 1, $pageSize = 100): array
     {
         $source = new SourceDB($host, $user, $pass, $dbName);
         $source = $source->connect();
-        $sql = "SELECT * FROM ".$tableName.";";
-        $stmt = $source->prepare($sql);
-        $stmt->execute();
-        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $totalRows = $this->countRows($source, $tableName);
+        if ($totalRows >= 100) {
+            $totalPages = ceil($totalRows / $pageSize);
+            $offset = ($page - 1) * $pageSize;
+
+            $results = [];
+            $sql = "SELECT * FROM {$tableName} LIMIT {$pageSize} OFFSET {$offset};";
+            $stmt = $source->prepare($sql);
+            $stmt->execute();
+
+        } else {
+            $sql = "SELECT * FROM {$tableName}";
+            $stmt = $source->prepare($sql);
+            $stmt->execute();
+            $results = [];
+
+        }
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $results[] = $row;
+        }
+
         return [
             'host' => $host,
             'user' => $user,
             'pass' => $pass,
             'db' => $dbName,
-            'table'  => $tableName,
-            'results' => $results
+            'table' => $tableName,
+            'results' => $results,
+            'total_pages' => $totalPages ?? $page,
+            'current_page' => $page
         ];
+
     }
+    public function countRows(PDO $source, string $tableName): int
+    {
+        $sql = "SELECT COUNT(*) as total_rows FROM {$tableName}";
+        $stmt = $source->prepare($sql);
+        $stmt->execute();
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        return (int) $row['total_rows'];
+    }
+
+
 }

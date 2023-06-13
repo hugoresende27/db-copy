@@ -17,6 +17,7 @@ if (!function_exists('dd')) {
 if (!function_exists('createResponse')) {
     function createResponse(Response $response, $data = "no data", $status = 200): Response
     {
+
         $response->getBody()->write(json_encode($data));
         return $response
             ->withHeader('Content-Type', 'application/json')

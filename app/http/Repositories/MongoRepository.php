@@ -2,6 +2,8 @@
 
 namespace http\Repositories;
 use MongoDB\Client;
+use MongoDB\Collection;
+
 class MongoRepository
 {
     protected Client $client;
@@ -9,6 +11,12 @@ class MongoRepository
     public function __construct(Client $client)
     {
         $this->client = $client;
+    }
+
+
+    public function getCollection(string $databaseName, string $collectionName): Collection
+    {
+        return $this->client->selectCollection($databaseName, $collectionName);
     }
 
     public function getCollectionNames(string $databaseName): array
@@ -41,16 +49,32 @@ class MongoRepository
     public function createDatabase(string $databaseName): bool
     {
         $databases = $this->client->listDatabases();
-
         foreach ($databases as $database) {
             if ($database->getName() === $databaseName) {
                 return false; // Database already exists
             }
         }
-
-        $this->client->createDatabase($databaseName);
+        $this->client->selectDatabase($databaseName);
+        // The database will be created when you perform an operation on it, like inserting a document
         return true;
     }
 
+    public function collectionExists(string $databaseName, string $collectionName): bool
+    {
+        $collectionList = $this->client->selectDatabase($databaseName)->listCollections();
+        foreach ($collectionList as $collection) {
+            if ($collection->getName() === $collectionName) {
+                return true; // Collection exists
+            }
+        }
+        return false; // Collection does not exist
+    }
+
+    public function deleteCollection(string $databaseName, string $collectionName): bool
+    {
+        $collection = $this->client->selectDatabase($databaseName)->selectCollection($collectionName);
+        $result = $collection->drop();
+        return $result["ok"] == 1; // Returns true if the deletion was successful, false otherwise
+    }
 
 }
