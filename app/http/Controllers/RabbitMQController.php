@@ -79,6 +79,21 @@ class RabbitMQController
         return createResponse($response, $message);
     }
 
+    public function publishMessage(string $message, string $exchange )
+    {
+
+        $channel = $this->rabbitMQ->connection->channel();
+        $channel->exchange_declare($exchange, 'direct', false, false, false);
+        $channel->queue_declare($this->rabbitMQ->rabbitMQQueueTests, false, false, false, false);
+        $channel->queue_bind($this->rabbitMQ->rabbitMQQueueTests, $exchange, 'db-copy');
+
+        $msg = new AMQPMessage($message);
+        $channel->basic_publish($msg, $exchange, 'db-copy');
+        $channel->close();
+        $this->rabbitMQ->connection->close();
+
+    }
+
     /**
      * @param Request $request
      * @param Response $response
@@ -94,8 +109,7 @@ class RabbitMQController
         $message = getRequest($request);
         $finalMessage = $message['message'].' :: at '.$currentTime;
 
-        $connection = new AMQPStreamConnection($this->rabbitMQ->rabbitMQHost, $this->rabbitMQ->rabbitMQPort, $this->rabbitMQ->rabbitMQUser, $this->rabbitMQ->rabbitMQPassword);
-        $channel = $connection->channel();
+        $channel = $this->rabbitMQ->connection->channel();
 
         $channel->queue_declare($this->rabbitMQ->rabbitMQQueueTests, false, false, false, false);
 
@@ -104,7 +118,7 @@ class RabbitMQController
 
 
         $channel->close();
-        $connection->close();
+        $this->rabbitMQ->connection->close();
         // Return a success response
         $response->getBody()->write('message send with success :: '.$finalMessage);
         return $response->withStatus(200);

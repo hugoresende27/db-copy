@@ -16,12 +16,14 @@ class HomeController
     private MongoRepository $mongoRepository;
     private Client $client;
     private mixed $mongoDBName;
+    private RabbitMQController $rabbitMQController;
 
     public function __construct()
     {
         $this->client = new Client($_ENV['MONGO_URI']);
         $this->mongoDBName = $_ENV['MONGO_DB'];;
         $this->mongoRepository = new MongoRepository($this->client);
+        $this->rabbitMQController = new RabbitMQController();
     }
 
     /**
@@ -120,13 +122,13 @@ class HomeController
     }
 
 
-
     public function copySourceTableToMongo(Request $request, Response $response, $table): Response
     {
+        ini_set('max_execution_time', 900); // Set maximum execution time
+
         $credentials = getRequest($request);
         $copyDbName = $credentials['copy_db_name'];
         $source = new SourceRepository();
-        $finalData = $source->readTable($credentials['host'], $credentials['user'], $credentials['pass'], $credentials['db'], $table['table']);
 
         //create mongoDB database
         $databaseCreated = $this->mongoRepository->createDatabase($copyDbName);
@@ -140,22 +142,34 @@ class HomeController
         $collectionCreated = $this->mongoRepository->addCollection($copyDbName, $table['table']);
 
         // Get the MongoDB collection object
-        $collection = $this->mongoRepository->getCollection($copyDbName, $table['table']);
+//        $collection = $this->mongoRepository->getCollection($copyDbName, $table['table']);
+
 
         $totalRecords = 0;
-        foreach ($finalData['results'] as $result) {
-            foreach ($result as $key => $value) {
-                if (is_string($value)) {
-                    // Fix UTF-8 encoding or remove invalid characters
-                    $result[$key] = mb_convert_encoding($value, 'UTF-8', 'UTF-8');
+
+
+        $finalData = $source->readTable($credentials['host'], $credentials['user'], $credentials['pass'], $credentials['db'], $table['table']);
+
+        $i = 1;
+        while ($finalData['total_pages'] >= $i) {
+            $finalData = $source->readTable($credentials['host'], $credentials['user'], $credentials['pass'], $credentials['db'], $table['table'], $i++);
+            foreach ($finalData['results'] as $result) {
+                foreach ($result as $key => $value) {
+                    if (is_string($value)) {
+                        // Fix UTF-8 encoding or remove invalid characters
+                        $result[$key] = mb_convert_encoding($value, 'UTF-8', 'UTF-8');
+                    }
                 }
+
+                $result['source_table'] = $table['table'];
+
+                //insert record in mongoDB
+//            $collection->insertOne($result);
+                $this->rabbitMQController->publishMessage(json_encode($result), 'dbcopy');
+                $totalRecords++;
             }
-
-
-            //insert record in mongoDB
-            $collection->insertOne($result);
-            $totalRecords++;
         }
+
 
         $finalRes = [
             'database_created' => $databaseCreated,
@@ -166,9 +180,22 @@ class HomeController
         return createResponse($response, $finalRes);
     }
 
+    private function retrieveFinalData(SourceRepository $source, array $credentials, $table): array
+    {
+        $finalData = $source->readTable($credentials['host'], $credentials['user'], $credentials['pass'], $credentials['db'], $table['table']);
+
+        $i = 1;
+        while ($finalData['total_pages'] >= $i) {
+            $moreData = $source->readTable($credentials['host'], $credentials['user'], $credentials['pass'], $credentials['db'], $table['table'], $i++);
+            $finalData['results'] = array_merge($moreData['results'], $finalData['results']);
+        }
+
+        return $finalData;
+    }
 
     public function dev()
     {
+        $this->rabbitMQController->publishMessage('hugo','hugo');
         dd('dev');
     }
 }

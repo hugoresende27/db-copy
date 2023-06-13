@@ -65,9 +65,9 @@ class SourceRepository implements SourceRepositoryInterface
             'pass' => $pass,
             'db' => $dbName,
             'table' => $tableName,
-            'results' => $results,
             'total_pages' => $totalPages ?? $page,
-            'current_page' => $page
+            'current_page' => $page,
+            'results' => $results
         ];
 
     }
