@@ -21,3 +21,13 @@ services:
       options:
         max-size: 1g
     image: mongo
+
+  rabbitmq:
+    container_name: db-copy_rabbitmq
+    image: rabbitmq:management
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    ports:
+      - '5672:5672'
+      - '15672:15672'

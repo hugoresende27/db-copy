@@ -1,13 +1,14 @@
 <?php
 
 namespace http\Controllers;
+
 use http\Repositories\MongoRepository;
 use http\Repositories\SourceRepository;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
-
 use MongoDB\Client;
 use MongoDB\Driver\Exception\Exception;
+use Slim\Routing\RouteCollector;
 
 class HomeController
 {
@@ -30,15 +31,18 @@ class HomeController
      */
     public function docs(Request $request, Response $response): Response
     {
+        global $routesList;
+        $endpoints = [];
+        foreach ($routesList as $route)
+        {
+            $endpoints [] = $route->getPattern();
+        }
+
         $data = [
-            'welcome to db-copy app, made by Hugo Resende',
-            'endpoints' => [
-                'HomeController' => [
-                    '/' => 'index',
-                    '/hello/{name}' => 'hello'
-                ]
-            ]
+            'app' => 'welcome to db-copy app, made by Hugo Resende',
+            'endpoints' => $endpoints
         ];
+
         createResponse($response,$data);
         return $response;
     }
@@ -147,6 +151,7 @@ class HomeController
                 }
             }
 
+
             //insert record in mongoDB
             $collection->insertOne($result);
             $totalRecords++;
@@ -162,4 +167,8 @@ class HomeController
     }
 
 
+    public function dev()
+    {
+        dd('dev');
+    }
 }
