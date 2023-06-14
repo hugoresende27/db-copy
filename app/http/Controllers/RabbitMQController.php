@@ -1,7 +1,7 @@
 <?php
-namespace http\Controllers;
+namespace App\http\Controllers;
 
-use connect\RabbitMQ;
+use App\connect\RabbitMQ;
 use DateInterval;
 use DateTime;
 use PhpAmqpLib\Connection\AMQPStreamConnection;

@@ -1,6 +1,6 @@
 <?php
 
-namespace connect;
+namespace App\connect;
 use PDO;
 class SourceDB
 {

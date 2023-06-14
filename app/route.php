@@ -1,10 +1,10 @@
 <?php
 
 
-use http\Controllers\HomeController;
-use http\Controllers\RabbitMQController;
-use PhpAmqpLib\Connection\AMQPStreamConnection;
-use PhpAmqpLib\Message\AMQPMessage;
+use App\http\Controllers\HomeController;
+use App\http\Controllers\MongoDBController;
+use App\http\Controllers\RabbitMQController;
+
 use Slim\App;
 
 return function (App $app) {
@@ -15,7 +15,7 @@ return function (App $app) {
     $app->get('/', [HomeController::class, 'index']);
     $app->get('/docs', [HomeController::class, 'docs']);
     $app->get('/hello/{name}', [HomeController::class, 'hello']);
-    $app->get('/mongo', [HomeController::class, 'mongoConnect']);
+    $app->get('/mongo', [MongoDBController::class, 'mongoConnect']);
 
     //source routes
     $app->post('/source', [HomeController::class, 'sourceConnect']);

@@ -1,9 +1,9 @@
 <?php
 
-namespace http\Controllers;
+namespace App\http\Controllers;
 
-use http\Repositories\MongoRepository;
-use http\Repositories\SourceRepository;
+use App\http\Repositories\MongoRepository;
+use App\http\Repositories\SourceRepository;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use MongoDB\Client;
@@ -15,13 +15,12 @@ class HomeController
 
     private MongoRepository $mongoRepository;
     private Client $client;
-    private mixed $mongoDBName;
+
     private RabbitMQController $rabbitMQController;
 
     public function __construct()
     {
         $this->client = new Client($_ENV['MONGO_URI']);
-        $this->mongoDBName = $_ENV['MONGO_DB'];;
         $this->mongoRepository = new MongoRepository($this->client);
         $this->rabbitMQController = new RabbitMQController();
     }
@@ -72,17 +71,7 @@ class HomeController
         return createResponse($response, $string);
     }
 
-    public function mongoConnect(Request $request, Response $response)
-    {
 
-        try {
-            $collectionNames = $this->mongoRepository->getCollectionNames($this->mongoDBName);
-            return createResponse($response, $collectionNames);
-        } catch (Exception $e) {
-            dd(printf($e->getMessage()));
-        }
-
-    }
 
 
     /**

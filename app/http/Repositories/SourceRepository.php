@@ -1,8 +1,8 @@
 <?php
 
-namespace http\Repositories;
+namespace App\http\Repositories;
 
-use connect\SourceDB;
+use App\connect\SourceDB;
 use PDO;
 
 class SourceRepository implements SourceRepositoryInterface

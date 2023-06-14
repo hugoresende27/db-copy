@@ -2,7 +2,7 @@
 namespace consumers;
 require __DIR__. '/../../vendor/autoload.php';
 require __DIR__. '/../../app/http/Repositories/MongoRepository.php';
-use http\Repositories\MongoRepository;
+use App\http\Repositories\MongoRepository;
 use MongoDB\Client;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 
