@@ -18,6 +18,7 @@ return function (App $app) {
     $app->get('/mongo', [MongoDBController::class, 'mongoConnect']);
     $app->get('/mongo/{collection}', [MongoDBController::class, 'mongoGetCollection']);
     $app->get('/mongo/{collection}/{limit}', [MongoDBController::class, 'mongoGetCollection']);
+    $app->post('/mongo/{collection}/{limit}', [MongoDBController::class, 'mongoGetCollection']);
 
     //source routes
     $app->post('/source', [HomeController::class, 'sourceConnect']);

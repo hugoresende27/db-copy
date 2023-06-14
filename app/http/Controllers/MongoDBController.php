@@ -36,8 +36,10 @@ class MongoDBController
     public function mongoGetCollection(Request $request, Response $response, $args)
     {
 
+        $fields = getRequest($request);
+        $fields = $fields['fields'] ?? [];
         try {
-            $collection = $this->mongoRepository->findDocument($this->mongoDBName, $args['collection'], $args['limit'] ?? 100);
+            $collection = $this->mongoRepository->findDocument($this->mongoDBName, $args['collection'], $args['limit'] ?? 100, $fields);
             return createResponse($response, $collection);
         } catch (Exception $e) {
             dd(printf($e->getMessage()));

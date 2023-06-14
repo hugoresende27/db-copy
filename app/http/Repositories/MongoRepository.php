@@ -1,6 +1,7 @@
 <?php
 
 namespace App\http\Repositories;
+
 use MongoDB\Client;
 use MongoDB\Collection;
 
@@ -74,17 +75,29 @@ class MongoRepository
     {
         $collection = $this->client->selectDatabase($databaseName)->selectCollection($collectionName);
         $result = $collection->drop();
-        return $result["ok"] == 1; // Returns true if the deletion was successful, false otherwise
+        return true;
     }
 
-    public function findDocument(string $databaseName, string $collectionName, int $limit)
+    public function findDocument(string $databaseName, string $collectionName, int $limit, array $fields): array
     {
         $collection = $this->client->selectDatabase($databaseName)->selectCollection($collectionName);
-        $cursor = $collection->find([], ['limit' => $limit]);
+        if (!empty($fields)) {
+            $projectionArray = [];
+            foreach ($fields as $field) {
+                $projectionArray[$field] = 1;
+            }
+
+        }
+
+        $cursor = $collection->find([], [
+                'projection' => $projectionArray ?? null,
+                'limit' => $limit
+            ]
+        );
         $results = [];
         foreach ($cursor as $document) {
 
-            $results[] =  $document;
+            $results[] = $document;
         }
         return $results;
     }
