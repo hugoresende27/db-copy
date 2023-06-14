@@ -16,6 +16,8 @@ return function (App $app) {
     $app->get('/docs', [HomeController::class, 'docs']);
     $app->get('/hello/{name}', [HomeController::class, 'hello']);
     $app->get('/mongo', [MongoDBController::class, 'mongoConnect']);
+    $app->get('/mongo/{collection}', [MongoDBController::class, 'mongoGetCollection']);
+    $app->get('/mongo/{collection}/{limit}', [MongoDBController::class, 'mongoGetCollection']);
 
     //source routes
     $app->post('/source', [HomeController::class, 'sourceConnect']);

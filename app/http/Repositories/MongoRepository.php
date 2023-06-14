@@ -77,4 +77,16 @@ class MongoRepository
         return $result["ok"] == 1; // Returns true if the deletion was successful, false otherwise
     }
 
+    public function findDocument(string $databaseName, string $collectionName, int $limit)
+    {
+        $collection = $this->client->selectDatabase($databaseName)->selectCollection($collectionName);
+        $cursor = $collection->find([], ['limit' => $limit]);
+        $results = [];
+        foreach ($cursor as $document) {
+
+            $results[] =  $document;
+        }
+        return $results;
+    }
+
 }

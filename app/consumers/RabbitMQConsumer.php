@@ -1,5 +1,5 @@
 <?php
-namespace consumers;
+namespace App\consumers;
 require __DIR__. '/../../vendor/autoload.php';
 require __DIR__. '/../../app/http/Repositories/MongoRepository.php';
 use App\http\Repositories\MongoRepository;

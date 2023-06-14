@@ -32,4 +32,18 @@ class MongoDBController
         }
 
     }
+
+    public function mongoGetCollection(Request $request, Response $response, $args)
+    {
+
+        try {
+            $collection = $this->mongoRepository->findDocument($this->mongoDBName, $args['collection'], $args['limit'] ?? 100);
+            return createResponse($response, $collection);
+        } catch (Exception $e) {
+            dd(printf($e->getMessage()));
+        }
+
+    }
+
+
 }
