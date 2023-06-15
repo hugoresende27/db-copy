@@ -5,7 +5,7 @@
 ### to enter root project : sudo docker exec -it [containerName] /bin/bash
 ### to stop and remove images : docker-compose down --rmi all
 ### get ip of docker container : sudo docker inspect [containerName]  | grep "IPAddress"
-
+### to run a test : ./vendor/bin/phpunit app/test/RouteTest.php
 
 
 ------------------------------------------------

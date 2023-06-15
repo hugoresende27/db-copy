@@ -4,11 +4,11 @@ namespace App\http\Controllers;
 
 use App\http\Repositories\MongoRepository;
 use App\http\Repositories\SourceRepository;
+
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use MongoDB\Client;
-use MongoDB\Driver\Exception\Exception;
-use Slim\Routing\RouteCollector;
+
 
 class HomeController
 {
@@ -44,8 +44,7 @@ class HomeController
             'endpoints' => $endpoints
         ];
 
-        createResponse($response,$data);
-        return $response;
+        return createResponse($response,$data);
     }
 
     /**
@@ -184,7 +183,6 @@ class HomeController
 
     public function dev()
     {
-        $this->rabbitMQController->publishMessage('hugo','hugo');
         dd('dev');
     }
 }
