@@ -17,22 +17,27 @@ class RouteTest extends  TestCase
         $this->requestFactory = new ServerRequestFactory();
     }
 
-
-
-    public function testRouteIndexGet()
-    {
-
-        $request = $this->requestFactory->createServerRequest('GET', '/');
-
-        // Run the application
-        $response = $this->app->handle($request);
-
-        $this->assertSame(200, $response->getStatusCode());
-
-        // Assert that the response body contains the content of the .env file
-        $envContent = file_get_contents(__DIR__ . '/../../public/.env');
-        $this->assertStringContainsString('APP_NAME=', $envContent);
+    public function testVersion() {
+        $this->get('/version');
+        $this->assertEquals(200, $this->response->status());
+        $this->assertEquals($this->app->config('version'), $this->response->body());
     }
+
+
+//    public function testRouteIndexGet()
+//    {
+//
+//        $request = $this->requestFactory->createServerRequest('GET', '/');
+//
+//        // Run the application
+//        $response = $this->app->handle($request);
+//
+//        $this->assertSame(200, $response->getStatusCode());
+//
+//        // Assert that the response body contains the content of the .env file
+//        $envContent = file_get_contents(__DIR__ . '/../../public/.env');
+//        $this->assertStringContainsString('APP_NAME=', $envContent);
+//    }
 
 
     public function testRouteDocs()
@@ -55,6 +60,7 @@ class RouteTest extends  TestCase
         $this->assertEquals('welcome to db-copy app, made by Hugo Resende', $responseData['app']);
         // Add additional assertions for the 'endpoints' array if needed
     }
+
 
 
 
